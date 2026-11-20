@@ -23,7 +23,6 @@ export default function SouthIndianChart({ chartData, selectedItem, onSelectItem
 
   // లగ్నం ఏ రాశిలో ఉందో లెక్కించడం (0 - 11)
   const lagnamRashiIndex = Math.floor((((ascendant % 360) + 360) % 360) / 30);
-
   // ప్రతీ రాశిలో ఏయే గ్రహాలు ఉన్నాయో గ్రూప్ చేయడం
   const rashiPlanets: { [key: number]: any[] } = {};
   for (let i = 0; i < 12; i++) rashiPlanets[i] = [];
