@@ -1,26 +1,73 @@
-@import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+body {
+  background-color: #0b0e17;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.astro-card {
+  background-color: #131826;
+  border: 1px solid #252e46;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+.wheel-container {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.astro-svg {
+  width: 100%;
+  height: auto;
+  user-select: none;
+  filter: drop-shadow(0 0 25px rgba(79, 114, 205, 0.12));
+}
+
+.planet-node {
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+@media print {
+  .col-lg-4,
+  button,
+  footer {
+    display: none !important;
+  }
+  .col-lg-8 {
+    width: 100% !important;
+  }
+  body,
+  main {
+    background: #ffffff !important;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+input[type="date"].form-control,
+input[type="time"].form-control {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+  color-scheme: light;
+}
+
+.planet-node:hover .planet-badge {
+  stroke: #ffffff;
+  stroke-width: 2.5px;
+  fill: #2c395c;
+}
+
+.aspect-line {
+  transition: opacity 0.25s ease, stroke-width 0.25s ease;
+  cursor: pointer;
+}
+
+.aspect-line:hover {
+  stroke-width: 3px !important;
+  opacity: 1 !important;
+}
+
+.zodiac-glyph {
+  font-family: 'Segoe UI Symbol', 'Apple Symbols', 'DejaVu Sans', sans-serif;
 }
