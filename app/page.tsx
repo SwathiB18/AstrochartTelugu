@@ -361,7 +361,7 @@ export default function Home() {
           <div className="card shadow-sm border-0 rounded-4 bg-white">
             <div className="card-body p-4 text-center">
               <h2 className="h5 mb-2 text-dark fw-bold">
-                {chartData.subject} - నమూనా చార్ట్ డేటా
+                {chartData.subject} -  దక్షిణాది  రాశి చక్రం
               </h2>
 
               {/* Print & Download బటన్లు */}
@@ -464,14 +464,23 @@ export default function Home() {
         </div>
       </div>
 
-      <footer className="mt-5 py-4 bg-white border-top border-secondary-subtle">
-        <div className="container-fluid px-lg-5 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
-          <span className="text-dark small">
-            &copy; 2026 by <strong className="text-dark fw-semibold">Swathi Bommaraju</strong> | All rights reserved.
-          </span>
-          <span className="text-dark small">
-            దక్షిణాది వేద జ్యోతిష్య చక్రం(South Indian Kundli)
-          </span>
+    <footer className="mt-5 py-4 bg-white border-top border-secondary-subtle">
+        <div className="container-fluid px-lg-5">
+          <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 mb-2">
+            <span className="text-dark small">
+              &copy; 2026 by <strong className="text-dark fw-semibold">Swathi Bommaraju</strong> | All rights reserved.
+            </span>
+            <span className="text-dark small">
+              దక్షిణాది వేద జ్యోతిష్య చక్రం(South Indian Kundli)
+            </span>
+          </div>
+
+          <p className="text-muted mb-1" style={{ fontSize: '0.75rem', lineHeight: 1.5 }}>
+            <strong>గమనిక:</strong> ఈ చక్రంలోని లగ్నం, రాశులు, నక్షత్రాలు మరియు గ్రహ స్థానాలు స్వయం-గణిత సూత్రాల ఆధారంగా రూపొందించబడినవి. పంచాంగం లేదా ఖచ్చితమైన ఎఫెమెరిస్‌తో పోలిస్తే స్వల్ప నిమిషాల/డిగ్రీల తేడాలు ఉండవచ్చు. ఇది సమాచారం మరియు అభ్యాసం కోసం మాత్రమే.
+          </p>
+          <p className="text-muted mb-0" style={{ fontSize: '0.75rem', lineHeight: 1.5 }}>
+            <strong>Disclaimer:</strong> Ascendant, zodiac signs, nakshatras, and planetary longitudes in this chart are generated using standalone mathematical formulas. Minor minute or degree differences may occur compared to a traditional panchangam or full ephemeris. Provided for informational and educational purposes only.
+          </p>
         </div>
       </footer>
     </main>
