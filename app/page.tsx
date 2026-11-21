@@ -3,24 +3,34 @@
 import React, { useState, useEffect } from 'react';
 import SouthIndianChart from './components/SouthIndianChart.tsx';
 
-import AstroWheel,{
-
+import AstroWheel, {
   formatZodiacPosition,
   getHousePlacement,
 } from './components/AstroWheel.tsx';
-import {  getNakshatraInfo,fetchNatalChart, SAMPLE_CHART_DATA} from './lib/astro.js'
+import { getNakshatraInfo, fetchNatalChart, SAMPLE_CHART_DATA } from './lib/astro.js';
 
+function formatDisplayTime(timeStr?: string): string {
+  if (!timeStr) return '';
+  const parts = timeStr.trim().split(':');
+  if (parts.length < 2) return timeStr;
+  const hours24 = parseInt(parts[0], 10);
+  const minutes = parts[1].padStart(2, '0');
+  const seconds = parts[2] ? `:${parts[2].padStart(2, '0')}` : '';
+  if (Number.isNaN(hours24)) return timeStr;
+  const period = hours24 >= 12 ? 'PM' : 'AM';
+  const hours12 = hours24 % 12 === 0 ? 12 : hours24 % 12;
+  return `${hours12}:${minutes}${seconds} ${period}`;
+}
 
-
-
-
-
-
-
+function formatGenderLabel(gender?: string): string {
+  if (gender === 'Female') return 'స్త్రీ  (Female)';
+  return 'పురుషుడు (Male)';
+}
 
 export default function Home() {
   const [formData, setFormData] = useState({
     name: 'Sri Ram',
+    gender: 'Male',
     date: '1995-08-24',
     time: '14:30:00',
     location: 'Hyderabad, India',
@@ -28,7 +38,10 @@ export default function Home() {
     longitude: '78.4867',
   });
 
-  const [chartData, setChartData] = useState(SAMPLE_CHART_DATA);
+  const [chartData, setChartData] = useState<any>({
+    ...SAMPLE_CHART_DATA,
+    meta: { ...SAMPLE_CHART_DATA.meta, gender: 'Male' },
+  });
   const [loading, setLoading] = useState(false);
   const [fetchingLocation, setFetchingLocation] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
@@ -63,7 +76,9 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [formData.location]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -73,57 +88,65 @@ export default function Home() {
     setLoading(true);
     setSelectedItem(null);
     const result = await fetchNatalChart(formData);
-    setChartData(result);
+    setChartData({
+      ...result,
+      meta: {
+        ...result.meta,
+        gender: formData.gender,
+      },
+    });
     setLoading(false);
   };
+
   const handleDownloadChart = () => {
-  const svgElement = document.querySelector('#south-indian-chart-box svg') as SVGSVGElement | null;
-  if (!svgElement) return;
+    const svgElement = document.querySelector('#south-indian-chart-box svg') as SVGSVGElement | null;
+    if (!svgElement) return;
 
-  const exportSize = 1200; // చక్రం పెద్దదిగా, స్పష్టంగా రావడానికి సైజు
-  const clonedSvg = svgElement.cloneNode(true) as SVGSVGElement;
+    const exportSize = 1200;
+    const clonedSvg = svgElement.cloneNode(true) as SVGSVGElement;
 
-  if (!clonedSvg.getAttribute('xmlns')) {
-    clonedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-  }
-  clonedSvg.removeAttribute('style');
-  clonedSvg.setAttribute('width', String(exportSize));
-  clonedSvg.setAttribute('height', String(exportSize));
-
-  const serializer = new XMLSerializer();
-  const svgString = serializer.serializeToString(clonedSvg);
-  const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-  const url = URL.createObjectURL(svgBlob);
-
-  const img = new Image();
-  img.onload = () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = exportSize;
-    canvas.height = exportSize;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, exportSize, exportSize);
-      ctx.drawImage(img, 0, 0, exportSize, exportSize);
-
-      const pngUrl = canvas.toDataURL('image/png', 1.0);
-      const link = document.createElement('a');
-      link.download = `${formData.name || 'kundli'}-south-indian-chart.png`;
-      link.href = pngUrl;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+    if (!clonedSvg.getAttribute('xmlns')) {
+      clonedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     }
-    URL.revokeObjectURL(url);
+    clonedSvg.removeAttribute('style');
+    clonedSvg.setAttribute('width', String(exportSize));
+    clonedSvg.setAttribute('height', String(exportSize));
+
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(clonedSvg);
+    const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = exportSize;
+      canvas.height = exportSize;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, exportSize, exportSize);
+        ctx.drawImage(img, 0, 0, exportSize, exportSize);
+
+        const pngUrl = canvas.toDataURL('image/png', 1.0);
+        const link = document.createElement('a');
+        link.download = `${formData.name || 'kundli'}-south-indian-chart.png`;
+        link.href = pngUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+      URL.revokeObjectURL(url);
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      console.error('Failed to render chart image.');
+    };
+
+    img.src = url;
   };
 
-  img.onerror = () => {
-    URL.revokeObjectURL(url);
-    console.error('Failed to render chart image.');
-  };
-
-  img.src = url;
-};
   const moonPlanet = chartData?.planets?.find(
     (p: any) => p.name.includes('చంద్రుడు') || p.symbol === '☽'
   );
@@ -134,10 +157,9 @@ export default function Home() {
   return (
     <main className="container-fluid py-4 px-lg-5 bg-light min-vh-100 text-dark">
       <header className="mb-4 pb-3 border-bottom border-secondary-subtle">
-      <h1 className="h3 mb-1 fw-bold" style={{ color: '#312e81' }}>
-  
-  దక్షిణాది వేద జ్యోతిష్య చక్రం (South Indian Kundli)
-</h1>
+        <h1 className="h3 mb-1 fw-bold" style={{ color: '#312e81' }}>
+          దక్షిణాది వేద జ్యోతిష్య చక్రం (South Indian Kundli)
+        </h1>
         <p className="fw-bold small mb-0" style={{ color: '#312e81' }}>
           తెలుగు / దక్షిణాది సంప్రదాయ గ్రిడ్ పద్ధతిలో రాశి చక్రం మరియు గ్రహాల అమరిక (Zodiac and planetary alignment in the traditional Telugu/South Indian grid format)
         </p>
@@ -164,33 +186,52 @@ export default function Home() {
                   />
                 </div>
 
-                <div className="row g-2 mb-3">
-                  <div className="col-6">
-                    <label className="form-label small text-dark">పుట్టిన తేదీ(Date of birth)</label>
+                {/* లింగం (Gender: Male / Female) */}
+                <div className="mb-3">
+                  <label className="form-label small text-dark">లింగం (Gender)</label>
+                  <select
+                    name="gender"
+                    className="form-select bg-light border-secondary-subtle text-dark"
+                    value={formData.gender}
+                    onChange={handleInputChange}
+                  >
+                    <option value="Male">పురుషుడు (Male)</option>
+                    <option value="Female">స్త్రీ (Female)</option>
+                  </select>
+                </div>
+
+                {/* Date & Time సమాంతర అలైన్‌మెంట్ */}
+                <div className="row g-2 mb-3 align-items-stretch">
+                  <div className="col-6 d-flex flex-column justify-content-between">
+                    <label className="form-label small text-dark mb-1">
+                      పుట్టిన తేదీ(Date of birth)
+                    </label>
                     <input
                       type="date"
                       name="date"
-                      className="form-control bg-light border border-secondary-subtle text-dark "
-    style={{
-      colorScheme: 'light',
-      borderColor: '#cbd5e1',
-    }}
+                      className="form-control bg-light border border-secondary-subtle text-dark mt-auto"
+                      style={{
+                        colorScheme: 'light',
+                        borderColor: '#cbd5e1',
+                      }}
                       value={formData.date}
                       onChange={handleInputChange}
                       required
                     />
                   </div>
-                  <div className="col-6">
-                    <label className="form-label small text-dark">సమయం (Time in IST)</label>
+                  <div className="col-6 d-flex flex-column justify-content-between">
+                    <label className="form-label small text-dark mb-1">
+                      సమయం (Time in IST)
+                    </label>
                     <input
                       type="time"
                       step="1"
                       name="time"
-                      className="form-control bg-light border border-secondary-subtle text-dark shadow-none"
-    style={{
-      colorScheme: 'light',
-      borderColor: '#cbd5e1',
-    }}
+                      className="form-control bg-light border border-secondary-subtle text-dark shadow-none mt-auto"
+                      style={{
+                        colorScheme: 'light',
+                        borderColor: '#cbd5e1',
+                      }}
                       value={formData.time}
                       onChange={handleInputChange}
                       required
@@ -219,30 +260,30 @@ export default function Home() {
                     required
                   />
                   <div className="form-text text-dark" style={{ fontSize: '0.7rem' }}>
-                    * నెట్‌వర్క్ లేకపోతే కింద ఉన్న అక్షాంశ, రేఖాంశాలను మీరే మార్చుకోండి .(Enter latitude & longitude manually if network is unavailable)
+                    - నెట్‌వర్క్ లేకపోతే కింద ఉన్న అక్షాంశ, రేఖాంశాలను మీరే మార్చుకోండి .(Enter latitude & longitude manually if network is unavailable)
                   </div>
                 </div>
 
-                <div className="row g-2 mb-4">
-                  <div className="col-6">
-                    <label className="form-label small text-dark">అక్షాంశం (Latitude)</label>
+                <div className="row g-2 mb-4 align-items-stretch">
+                  <div className="col-6 d-flex flex-column justify-content-between">
+                    <label className="form-label small text-dark mb-1">అక్షాంశం (Latitude)</label>
                     <input
                       type="number"
                       step="any"
                       name="latitude"
-                      className="form-control bg-light border-secondary-subtle text-dark"
+                      className="form-control bg-light border-secondary-subtle text-dark mt-auto"
                       value={formData.latitude}
                       onChange={handleInputChange}
                       required
                     />
                   </div>
-                  <div className="col-6">
-                    <label className="form-label small text-dark">రేఖాంశం (Longitude)</label>
+                  <div className="col-6 d-flex flex-column justify-content-between">
+                    <label className="form-label small text-dark mb-1">రేఖాంశం (Longitude)</label>
                     <input
                       type="number"
                       step="any"
                       name="longitude"
-                      className="form-control bg-light border-secondary-subtle text-dark"
+                      className="form-control bg-light border-secondary-subtle text-dark mt-auto"
                       value={formData.longitude}
                       onChange={handleInputChange}
                       required
@@ -319,43 +360,63 @@ export default function Home() {
         <div className="col-lg-8">
           <div className="card shadow-sm border-0 rounded-4 bg-white">
             <div className="card-body p-4 text-center">
-              <h2 className="h5 mb-1 text-dark">{chartData.subject} - దక్షిణాది రాశి చక్రం</h2>
-              <button
-    type="button"
-    
-    onClick={() => window.print()}
-    className="btn btn-outline-primary btn-sm  "
-  >
-    🖨️ Print / PDF
-  </button>
-  <button
-  type="button"
-  onClick={handleDownloadChart}
-  className="btn btn-outline-primary btn-sm"
-  style={{marginLeft:10}}
->
-  ⬇️ Download Chart
-</button>
-              <span className="small text-dark mb-4 d-block">
-                {chartData.meta.date} • {chartData.meta.location}
-              </span>
+              <h2 className="h5 mb-2 text-dark fw-bold">
+                {chartData.subject} - నమూనా చార్ట్ డేటా
+              </h2>
+
+              {/* Print & Download బటన్లు */}
+              <div className="d-flex flex-wrap justify-content-center gap-2 my-3">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="btn btn-outline-primary btn-sm px-3"
+                >
+                  🖨️ Print / PDF
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDownloadChart}
+                  className="btn btn-outline-primary btn-sm px-3"
+                >
+                  ⬇️ Download Chart
+                </button>
+              </div>
+
+              {/* బటన్ల తర్వాత లింగం / తేదీ / సమయం / ఊరు సారాంశ బార్ */}
+              <div className="d-inline-flex flex-wrap justify-content-center align-items-center gap-2 px-3 py-2 mb-4 rounded-3 bg-light border border-secondary-subtle small text-dark">
+                <span>👤 <strong>{formatGenderLabel(chartData.meta?.gender)}</strong></span>
+                <span className="text-secondary">•</span>
+                <span>📅 <strong>{chartData.meta?.date}</strong></span>
+                {chartData.meta?.time && (
+                  <>
+                    <span className="text-secondary">•</span>
+                    <span>🕒 <strong>{formatDisplayTime(chartData.meta.time)}</strong></span>
+                  </>
+                )}
+                {chartData.meta?.location && (
+                  <>
+                    <span className="text-secondary">•</span>
+                    <span>📍 <strong>{chartData.meta.location}</strong></span>
+                  </>
+                )}
+              </div>
 
               {/* దక్షిణాది చతురస్రాకార గ్రిడ్ చార్ట్ */}
               <div id="south-indian-chart-box">
-              <SouthIndianChart
-              
-                chartData={chartData}
-                selectedItem={selectedItem}
-                onSelectItem={setSelectedItem}
-              />
-</div>
+                <SouthIndianChart
+                  chartData={chartData}
+                  selectedItem={selectedItem}
+                  onSelectItem={setSelectedItem}
+                />
+              </div>
+
               {/* గ్రహాల పట్టిక */}
               <div className="table-responsive mt-4 text-start">
                 <table className="table table-hover table-sm align-middle mb-0 small">
                   <thead className="table-light">
                     <tr>
                       <th>గ్రహం(Planet)</th>
-                      <th>రాశి మరియు డిగ్రీలు(Zodiac sign &degrees)</th>
+                      <th>రాశి మరియు డిగ్రీలు(Zodiac sign &amp; degrees)</th>
                       <th>భావం (House)</th>
                       <th>స్థితి(Position)</th>
                     </tr>
@@ -402,18 +463,17 @@ export default function Home() {
           </div>
         </div>
       </div>
-      
-<footer className="mt-5 py-4 bg-white border-top border-secondary-subtle">
-  <div className="container-fluid px-lg-5 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
-    <span className="text-dark small">
-      &copy; 2026 by <strong className="text-dark fw-semibold">Swathi Bommaraju</strong> | All rights reserved.
-    </span>
-    <span className="text-dark small">
-       దక్షిణాది వేద జ్యోతిష్య చక్రం(South Indian Kundli)
-       
-    </span>
-  </div>
-</footer>
+
+      <footer className="mt-5 py-4 bg-white border-top border-secondary-subtle">
+        <div className="container-fluid px-lg-5 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+          <span className="text-dark small">
+            &copy; 2026 by <strong className="text-dark fw-semibold">Swathi Bommaraju</strong> | All rights reserved.
+          </span>
+          <span className="text-dark small">
+            దక్షిణాది వేద జ్యోతిష్య చక్రం(South Indian Kundli)
+          </span>
+        </div>
+      </footer>
     </main>
   );
 }

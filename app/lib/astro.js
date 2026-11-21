@@ -9,7 +9,7 @@ export const NAKSHATRAS = [
 
 // 12 రాశుల జాబితా
 export const RASHIS = [
-  'మేష (Ari)', 'వృషభ (Tau)', 'మిథున (Gem)', 'కర్కాటక(Can)', 'సింహ (Leo)', 'కన్య(Vir)',
+  'మేష(Ari)', 'వృషభ(Tau)', 'మిథున(Gem)', 'కర్కాటక(Can)', 'సింహ(Leo)', 'కన్య(Vir)',
   'తుల(Lib)', 'వృశ్చిక(Sco)', 'ధనుస్సు(Sag)', 'మకర(Cap)', 'కుంభ(Aqu)', 'మీన(Pis)'
 ];
 

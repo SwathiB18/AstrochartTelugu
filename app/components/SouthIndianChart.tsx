@@ -90,51 +90,63 @@ function formatTimeToAmPm(timeStr?: string): string {
                 strokeWidth="1.5"
               />
 
-              {/* రాశి పేరు మరియు సింబల్ */}
-              <text x="10" y="20" fill="#475569" fontSize="13" fontWeight="bold">
-                <tspan fill="#0284c7">{cell.symbol}</tspan> {cell.name}
-              </text>
+            {/* 1. సింబల్ + తెలుగు & ఇంగ్లీష్ రాశి పేరు */}
+<text x="10" y="17" fill="#334155" fontSize="10.5" fontWeight="bold">
+  <tspan fill="#0284c7" fontSize="12">{cell.symbol}</tspan> {cell.name}
+</text>
 
-              {/* లగ్నం గుర్తు */}
-              {isLagnam && (
-                <rect x="85" y="8" width="37" height="18" rx="3" fill="#0284c7" />
-              )}
-              {isLagnam && (
-                <text x="103.5" y="17" fill="#ffffff" fontSize="10" fontWeight="bold" textAnchor="middle" dominantBaseline="central">
-                  లగ్నం
-                </text>
-              )}
+{/* 2. లగ్నం(lag) బ్యాడ్జ్ — రాశి పేరు కింద స్పష్టమైన గ్యాప్‌తో */}
+{isLagnam && (
+  <g transform="translate(10, 24)">
+    <rect
+      width="64"
+      height="16"
+      rx="4"
+      fill="#0284c7"
+    />
+    <text
+      x="32"
+      y="8"
+      fill="#ffffff"
+      fontSize="8.8"
+      fontWeight="bold"
+      textAnchor="middle"
+      dominantBaseline="central"
+    >
+      లగ్నం(lag)
+    </text>
+  </g>
+)}
 
-              {/* గ్రహాల పేర్లు */}
-              <g transform="translate(15, 45)">
-                {planetsInRashi.map((p, idx) => {
-                  const pY = idx * 22;
-                  const houseNum = getHouse(p.longitude);
+{/* 3. గ్రహాల పేర్లు — లగ్నం ఉన్నప్పుడు y=58 నుండి, లేనప్పుడు y=40 నుండి */}
+<g transform={`translate(14, ${isLagnam ? 58 : 40})`}>
+  {planetsInRashi.map((p, idx) => {
+    const pY = idx * 18;
+    const houseNum = getHouse(p.longitude);
 
-                  return (
-                    <g
-                      key={p.name}
-                      style={{ cursor: 'pointer' }}
-                      onClick={() =>
-                        onSelectItem &&
-                        onSelectItem({
-                          type: 'planet',
-                          name: p.name,
-                          title: `${p.symbol} ${p.name}`,
-                          position: `${cell.symbol} ${cell.name} రాశి`,
-                          houseNum: houseNum,
-                          retrograde: p.retrograde,
-                        })
-                      }
-                    >
-                      <text x="0" y={pY} fill="#1e293b" fontSize="14" fontWeight="600" className="zodiac-glyph">
-                        {p.symbol} {p.name.split(' ')[0]} {p.retrograde ? '℞' : ''}
-                      </text>
-                    </g>
-                  );
-                })}
-              </g>
-            </g>
+    return (
+      <g
+        key={p.name}
+        style={{ cursor: 'pointer' }}
+        onClick={() =>
+          onSelectItem &&
+          onSelectItem({
+            type: 'planet',
+            name: p.name,
+            title: `${p.symbol} ${p.name}`,
+            position: `${cell.symbol} ${cell.name} రాశి`,
+            houseNum: houseNum,
+            retrograde: p.retrograde,
+          })
+        }
+      >
+        <text x="0" y={pY} fill="#1e293b" fontSize="12" fontWeight="600" className="zodiac-glyph">
+          {p.symbol} {p.name.split(' ')[0]} {p.retrograde ? '℞' : ''}
+        </text>
+      </g>
+    );
+  })}
+</g>          </g>
           );
         })}
 
