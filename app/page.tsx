@@ -9,6 +9,29 @@ import AstroWheel, {
 } from './components/AstroWheel.tsx';
 import { getNakshatraInfo, fetchNatalChart, SAMPLE_CHART_DATA } from './lib/astro.js';
 
+function formatDisplayDate(dateStr?: string): string {
+  if (!dateStr) return '';
+  const cleanStr = String(dateStr).trim().split('T')[0];
+
+  const isoMatch = cleanStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (isoMatch) {
+    const year = isoMatch[1];
+    const month = isoMatch[2].padStart(2, '0');
+    const day = isoMatch[3].padStart(2, '0');
+    return `${day}-${month}-${year}`;
+  }
+
+  const dmyMatch = cleanStr.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+  if (dmyMatch) {
+    const day = dmyMatch[1].padStart(2, '0');
+    const month = dmyMatch[2].padStart(2, '0');
+    const year = dmyMatch[3];
+    return `${day}-${month}-${year}`;
+  }
+
+  return cleanStr;
+}
+
 function formatDisplayTime(timeStr?: string): string {
   if (!timeStr) return '';
   const parts = timeStr.trim().split(':');
@@ -154,6 +177,8 @@ export default function Home() {
     ? getNakshatraInfo(moonPlanet.longitude)
     : { rashi: 'సింహం', nakshatra: 'పూర్వఫల్గుని (పుబ్బ)', pada: 1 };
 
+  const formattedDob = chartData?.meta?.date ? formatDisplayDate(chartData.meta.date) : '';
+
   return (
     <main className="container-fluid py-4 px-lg-5 bg-light min-vh-100 text-dark">
       <header className="mb-4 pb-3 border-bottom border-secondary-subtle">
@@ -260,7 +285,7 @@ export default function Home() {
                     required
                   />
                   <div className="form-text text-dark" style={{ fontSize: '0.7rem' }}>
-                    - నెట్‌వర్క్ లేకపోతే కింద ఉన్న అక్షాంశ, రేఖాంశాలను మీరే మార్చుకోండి .(Enter latitude & longitude manually if network is unavailable)
+                    -పుట్టిన ప్రదేశం ఆటో-లొకేషన్ రాకపోతే లేదా ఖచ్చితమైన విలువలు కావాలంటే అక్షాంశ, రేఖాంశాలను మీరే మార్చుకోండి. (Edit latitude &amp; longitude manually if auto-search doesn&apos;t match or needs fine-tuning.)
                   </div>
                 </div>
 
@@ -308,19 +333,21 @@ export default function Home() {
           <div className="card shadow-sm border-0 rounded-4 mb-4 bg-white border-start border-primary border-4">
             <div className="card-body p-4">
               <h3 className="h6 text-uppercase text-primary mb-3">ముఖ్య విశేషాలు (Key Highlights)</h3>
-              <div>
-                <p className="mb-2">
-                  <strong className="text-dark">జన్మ రాశి(Zodiac sign):</strong>{' '}
+              <div className="d-flex flex-column gap-2">
+                <div className="d-flex flex-wrap align-items-baseline gap-2">
+                  <strong className="text-dark small">జన్మ రాశి(Zodiac sign):</strong>
                   <span className="text-info fw-bold">{nakshatraInfo.rashi}</span>
-                </p>
-                <p className="mb-2">
-                  <strong className="text-dark">జన్మ నక్షత్రం(Birth star):</strong>{' '}
+                </div>
+
+                <div className="d-flex flex-wrap align-items-baseline gap-2">
+                  <strong className="text-dark small">జన్మ నక్షత్రం(Birth star):</strong>
                   <span className="text-success fw-bold">{nakshatraInfo.nakshatra}</span>
-                </p>
-                <p className="mb-0">
-                  <strong className="text-dark">పాదము(Pada):</strong>{' '}
+                </div>
+
+                <div className="d-flex flex-wrap align-items-baseline gap-2">
+                  <strong className="text-dark small">పాదము(Pada):</strong>
                   <span className="text-warning fw-bold">{nakshatraInfo.pada} వ పాదం</span>
-                </p>
+                </div>
               </div>
             </div>
           </div>
@@ -333,6 +360,11 @@ export default function Home() {
                 <div>
                   <div className="d-flex justify-content-between align-items-center mb-1">
                     <h5 className="text-info mb-0">{selectedItem.title}</h5>
+                    {selectedItem.type === 'lagnam' && (
+                      <span className="badge bg-primary-subtle text-primary border border-primary-subtle">
+                        లగ్నం (Lagnam)
+                      </span>
+                    )}
                     {selectedItem.retrograde && (
                       <span className="badge bg-danger-subtle text-danger border border-danger-subtle">
                         వక్రం (℞)
@@ -348,8 +380,7 @@ export default function Home() {
                 </div>
               ) : (
                 <p className="small text-dark mb-0">
-                  చక్రంపై లేదా పట్టికలో ఏదైనా గ్రహంపై క్లిక్ చేయండి.(Click any planet glyph on the Astrochart/table to
-                  inspect exact coordinates and placements).
+                  చక్రంపై లేదా పట్టికలో ఏదైనా గ్రహంపై లేదా <strong>లగ్నం(lag)</strong> గడిపై క్లిక్ చేయండి. (Click any planet or Lagnam box on the chart/table to inspect exact coordinates and placements).
                 </p>
               )}
             </div>
@@ -383,10 +414,10 @@ export default function Home() {
               </div>
 
               {/* బటన్ల తర్వాత లింగం / తేదీ / సమయం / ఊరు సారాంశ బార్ */}
-              <div className="d-inline-flex flex-wrap justify-content-center align-items-center gap-2 px-3 py-2 mb-4 rounded-3 bg-light border border-secondary-subtle small text-dark">
+              <div className="d-inline-flex flex-wrap justify-content-center align-items-center gap-2 px-3 py-2 mb-3 rounded-3 bg-light border border-secondary-subtle small text-dark">
                 <span>👤 <strong>{formatGenderLabel(chartData.meta?.gender)}</strong></span>
                 <span className="text-secondary">•</span>
-                <span>📅 <strong>{chartData.meta?.date}</strong></span>
+                <span>📅 <strong>{formattedDob}</strong></span>
                 {chartData.meta?.time && (
                   <>
                     <span className="text-secondary">•</span>
@@ -400,6 +431,8 @@ export default function Home() {
                   </>
                 )}
               </div>
+
+              
 
               {/* దక్షిణాది చతురస్రాకార గ్రిడ్ చార్ట్ */}
               <div id="south-indian-chart-box">
@@ -464,7 +497,7 @@ export default function Home() {
         </div>
       </div>
 
-    <footer className="mt-5 py-4 bg-white border-top border-secondary-subtle">
+      <footer className="mt-5 py-4 bg-white border-top border-secondary-subtle">
         <div className="container-fluid px-lg-5">
           <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 mb-2">
             <span className="text-dark small">
@@ -476,10 +509,10 @@ export default function Home() {
           </div>
 
           <p className="text-muted mb-1" style={{ fontSize: '0.75rem', lineHeight: 1.5 }}>
-            <strong>గమనిక:</strong> ఈ చక్రంలోని లగ్నం, రాశులు, నక్షత్రాలు మరియు గ్రహ స్థానాలు స్వయం-గణిత సూత్రాల ఆధారంగా రూపొందించబడినవి. పంచాంగం లేదా ఖచ్చితమైన ఎఫెమెరిస్‌తో పోలిస్తే స్వల్ప నిమిషాల/డిగ్రీల తేడాలు ఉండవచ్చు. ఇది సమాచారం మరియు అభ్యాసం కోసం మాత్రమే.
+            <strong>గమనిక:</strong> ఈ చక్రంలోని లగ్నం, రాశులు, నక్షత్రాలు మరియు గ్రహ స్థానాలు ఖగోళ ఎఫెమెరిస్ ఆధారంగా గణించబడినవి. ఇది సమాచారం మరియు సాంప్రదాయ అధ్యయనం కోసం మాత్రమే.
           </p>
           <p className="text-muted mb-0" style={{ fontSize: '0.75rem', lineHeight: 1.5 }}>
-            <strong>Disclaimer:</strong> Ascendant, zodiac signs, nakshatras, and planetary longitudes in this chart are generated using standalone mathematical formulas. Minor minute or degree differences may occur compared to a traditional panchangam or full ephemeris. Provided for informational and educational purposes only.
+            <strong>Disclaimer:</strong> Ascendant, zodiac signs, nakshatras, and planetary positions in this chart are calculated using astronomical ephemeris data. Provided for informational and traditional study purposes only.
           </p>
         </div>
       </footer>

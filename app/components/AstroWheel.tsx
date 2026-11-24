@@ -4,18 +4,18 @@ import React, { useMemo } from 'react';
 
 // తెలుగు రాశుల పేర్లు
 export const RASHIS = [
-  { name: 'మేష(Ari)', symbol: '♈', color: '#2b1922' },
-  { name: 'వృషభ(Tau)', symbol: '♉', color: '#172620' },
-  { name: 'మిథున (Gem)', symbol: '♊', color: '#262518' },
-  { name: 'కర్కాటక(Can)', symbol: '♋', color: '#152232' },
+  { name: 'మేష(Aries)', symbol: '♈', color: '#2b1922' },
+  { name: 'వృషభ(Taurus)', symbol: '♉', color: '#172620' },
+  { name: 'మిథున (Gemini)', symbol: '♊', color: '#262518' },
+  { name: 'కర్కాటక(Cancer)', symbol: '♋', color: '#152232' },
   { name: 'సింహ(Leo)', symbol: '♌', color: '#2b1922' },
-  { name: 'కన్య(Vir)', symbol: '♍', color: '#172620' },
-  { name: 'తుల(Lib)', symbol: '♎', color: '#262518' },
-  { name: 'వృశ్చిక(Sco)', symbol: '♏', color: '#152232' },
-  { name: 'ధనుస్సు(Sag)', symbol: '♐', color: '#2b1922' },
-  { name: 'మకర(Cap)', symbol: '♑', color: '#172620' },
-  { name: 'కుంభ(Aqu)', symbol: '♒', color: '#262518' },
-  { name: 'మీన(Pis)', symbol: '♓', color: '#152232' },
+  { name: 'కన్య(Virgo)', symbol: '♍', color: '#172620' },
+  { name: 'తుల(Libra)', symbol: '♎', color: '#262518' },
+  { name: 'వృశ్చిక(Scorpio)', symbol: '♏', color: '#152232' },
+  { name: 'ధనుస్సు(Sagittarius)', symbol: '♐', color: '#2b1922' },
+  { name: 'మకర(Capricorn)', symbol: '♑', color: '#172620' },
+  { name: 'కుంభ(Aquarius)', symbol: '♒', color: '#262518' },
+  { name: 'మీన(Pisces)', symbol: '♓', color: '#152232' },
 ];
 
 export const degToRad = (deg: number) => (deg * Math.PI) / 180;
