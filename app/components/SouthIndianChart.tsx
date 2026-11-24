@@ -109,9 +109,9 @@ export default function SouthIndianChart({ chartData, selectedItem, onSelectItem
     onSelectItem({
       type: 'lagnam',
       name: 'లగ్నం (Lagnam)',
-      title: '↑ లగ్నం (Lagnam)',
+      title: '↑ లగ్నం (Ascendant)',
       rashiName: cell.name,
-      position: `లగ్నం: ${cell.name}`,
+      position: `లగ్నం(Ascendant): ${cell.name}`,
       houseNum: 1,
       retrograde: false,
     });
@@ -182,7 +182,7 @@ export default function SouthIndianChart({ chartData, selectedItem, onSelectItem
                     textAnchor="middle"
                     dominantBaseline="central"
                   >
-                    లగ్నం(lag)
+                    లగ్నం(Asc)
                   </text>
                 </g>
               )}

@@ -362,7 +362,7 @@ export default function Home() {
                     <h5 className="text-info mb-0">{selectedItem.title}</h5>
                     {selectedItem.type === 'lagnam' && (
                       <span className="badge bg-primary-subtle text-primary border border-primary-subtle">
-                        లగ్నం (Lagnam)
+                        లగ్నం (Ascendant)
                       </span>
                     )}
                     {selectedItem.retrograde && (
@@ -380,7 +380,7 @@ export default function Home() {
                 </div>
               ) : (
                 <p className="small text-dark mb-0">
-                  చక్రంపై లేదా పట్టికలో ఏదైనా గ్రహంపై లేదా <strong>లగ్నం(lag)</strong> గడిపై క్లిక్ చేయండి. (Click any planet or Lagnam box on the chart/table to inspect exact coordinates and placements).
+                  చక్రంపై లేదా పట్టికలో ఏదైనా గ్రహంపై లేదా <strong>లగ్నం(Asc)</strong> గడిపై క్లిక్ చేయండి. (Click any planet or Asc box on the chart/table to inspect exact coordinates and placements).
                 </p>
               )}
             </div>
